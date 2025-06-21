@@ -1,0 +1,31 @@
+name: Deploy Apache Web Server
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Apache
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y apache2
+
+      - name: Deploy site content
+        run: |
+          sudo rm -rf /var/www/html/*
+          sudo cp -r public-html/. /var/www/html/
+
+      - name: Restart Apache
+        run: sudo systemctl restart apache2
+
+      - name: Verify Apache is running
+        run: |
+          curl -I http://localhost | grep "200 OK"
